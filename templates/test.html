@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<head>
+  <title>Test</title>
+  <script src="https://js.pusher.com/5.1/pusher.min.js"></script>
+  <script>
+
+    // Enable pusher logging - don't include this in production
+    Pusher.logToConsole = true;
+
+    var pusher = new Pusher('c73ea8196f369f3e7364', {
+      cluster: 'ap2',
+      forceTLS: true
+    });
+
+    var channel = pusher.subscribe('channel1');
+    channel.bind('my-event', function(data) {
+      alert(JSON.stringify(data));
+    });
+  </script>
+</head>
+<body>
+  <h1>Pusher Test</h1>
+  <p>
+    Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test 
+  </p>
+</body>

@@ -12,7 +12,7 @@
       forceTLS: true
     });
 
-    var channel = pusher.subscribe('channel2');
+    var channel = pusher.subscribe('channel1');
     channel.bind('my-event', function(data) {
         var test = document.getElementById('test')
       test.innerHTML = JSON.stringify(data)
@@ -22,8 +22,47 @@
 <body>
   <h1>Pusher Test</h1>
   <div id="test"></div>
+  <table style="border: 5px black solid;"><!--Dumping all the data initially-->
+    <tr>
+      <th>Username</th>
+      <th>Status</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
+      <th>Last Fetched</th>
+    </tr>
+    {% for data in all_data.global_plotted_coordinates %}
+      <tr>
+        <td>{{data.username}}</td>
+        <td>{{data.status}}</td>
+        <td id="latitude{{data.channel_id}}">{{data.latitude}}</td>
+        <td id="longitude{{data.channel_id}}">{{data.longitude}}</td>
+        <td id="last_fetch{{data.channel_id}}">{{data.last_fetch}}</td>
+      </tr>
+    {% endfor %}
+  </table>
   <p>
     Try publishing an event to channel <code>my-channel</code>
     with event name <code>my-event</code>.
   </p>
+<script>
+
+// Enable pusher logging - don't include this in production
+Pusher.logToConsole = true;
+
+var pusher = new Pusher('c73ea8196f369f3e7364', {
+  cluster: 'ap2',
+  forceTLS: true
+  });
+  {% for my_data in all_data.global_plotted_coordinates %}
+    var channel = pusher.subscribe("channel{{my_data.channel_id}}");
+    channel.bind('my-event', function(data) {
+      latitude = document.getElementById('latitude{{my_data.channel_id}}')
+      longitude = document.getElementById('longitude{{my_data.channel_id}}')
+      last_fetch = document.getElementById('last_fetch{{data.channel_id}}')
+      latitude.textContent = data.latitude
+      longitude.textContent = data.longitude
+      last_fetch.textContent = data.last_fetched
+    });
+  {% endfor %}
+</script>
 </body>

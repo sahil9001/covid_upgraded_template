@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import HttpResponse
-from . serializer import *
+from . serializer import locationSerializer,extendedUserSerializer,UserSerializer
 from datetime import datetime
 from django.contrib.auth.models import User
 import pytz
@@ -62,26 +62,48 @@ def inputLocation(request):
     serializer = locationSerializer(data= request.data)
     print(request.data)
     if serializer.is_valid():
-        new_location = locationDetail(user = user,latitude = request.data['latitude'], longitude = request.data['longitude'],last_fetched = datetime.now())
+        last_date = datetime.now()
+        new_location = locationDetail(user = user,latitude = request.data['latitude'], longitude = request.data['longitude'],last_fetched = last_date)
         #please manage the server time setting later 
         new_location.save()
-        data['sucess'] = "new location saved"
+        data['success'] = "new location saved"
         channel = "channel"+ str(request.user.id)
         print(channel)
-        pusher_client.trigger(channel, 'my-event', {'latitude': new_location.latitude,'longitude':new_location.longitude})
+        pusher_client.trigger(channel, 'my-event', {'latitude': new_location.latitude,'longitude':new_location.longitude,'last_fetch':str(last_date)})
         return Response(data = data ,status= status.HTTP_200_OK)
     return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
 def test(request):
-    return render(request,'table.html')
+    return render(request,'test.html')
+"""
 @api_view(['POST','GET'])
 @permission_classes([IsAuthenticated])
+"""
 def table(request):
     data = []
     all_user = extendedUser.objects.filter(~Q(status = 5))
     my_user = extendedUser.objects.get(user = request.user)
     for extend_user in all_user:
-        user_coordinates = {'channel_id':extend_user.user.id,'status':extend_user.status,'username':extend_user.user.username}
+        try:
+            location_detail = locationDetail.objects.filter(user = extend_user.user).order_by('-id')[0]
+            extend_user_latitude = location_detail.latitude
+            extend_user_longitude = location_detail.longitude
+            extend_user_last_fetch = location_detail.last_fetched
+        except:
+            extend_user_latitude = None
+            extend_user_longitude = None
+            extend_user_last_fetch = None
+        user_coordinates = {'channel_id':extend_user.user.id,'status':extend_user.status,'username':extend_user.user.username,'latitude':extend_user_latitude,'longitude':extend_user_longitude,'last_fetch':extend_user_last_fetch}
         print(extend_user.user.username + " id = " +str(extend_user.user.id))
         data.append(user_coordinates)
-    all_data = {'global_plotted_coordinates':data}
-    return Response(all_data)
+    try:
+        user_location_detail = locationDetail.objects.filter(user = request.user).order_by('-id')[0]
+        user_latitude = user_location_detail.longitude
+        user_longitude = user_location_detail.latitude
+        user_last_fetch = user_location_detail.last_fetched
+    except:
+        user_latitude = None
+        user_longitude = None
+        user_last_fetch = None 
+    user_coordinates = {'channel_id':request.user.id,'status':my_user.status,'username':request.user.username,'latitude':user_latitude,'longitude':user_longitude,'last_fetch':user_last_fetch}
+    all_data = {'global_plotted_coordinates':data,'user_plotted_data':user_coordinates}
+    return render(request,'table.html',{'all_data':all_data})
