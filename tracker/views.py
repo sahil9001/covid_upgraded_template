@@ -236,6 +236,17 @@ def pathtracing(request,user_id):
         past_loc = {'user':location.user.username,'latitude':location.latitude,'longitude':location.longitude,'last_fetched':str(location.last_fetched),'id':location.id}
         data.append(past_loc)
     return Response(data)
+@api_view(['POST','GET'])
+@permission_classes([IsAuthenticated])
+def search_user(request):
+    data = []
+    uname = request.data['username']
+    all_users = all_user = User.objects.filter(username__contains= uname)[:10]
+    for user in all_user:
+        instance_user = {'username':user.username,'id':user.id}
+        data.append(instance_user)
+    return Response(data)
+
 
 
 

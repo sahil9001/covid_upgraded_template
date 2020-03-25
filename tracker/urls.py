@@ -25,4 +25,5 @@ urlpatterns = [
     path('updateUserDetail/',views.updateUserDetail,name="updateUserDetail"),
     path('admin_add_user_detail/',views.admin_add_user_detail, name= "admin_add_user_detail"),
     path('pathtracing/<int:user_id>/',pathtracing,name = "pathTracing"),
+    path('search_user/',views.search_user, name = "search_user"),
 ]
