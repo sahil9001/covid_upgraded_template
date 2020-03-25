@@ -33,6 +33,13 @@ pusher_client = pusher.Pusher(
   cluster='ap2',
   ssl=True
 )
+####for nearest point import
+from django.db.models.functions import Radians, Power, Sin, Cos, ATan2, Sqrt, Radians
+from django.db.models import F
+import math
+from math import cos, sqrt
+R = 6371000 #radius of the Earth in m
+from math import radians, cos, sin, asin, sqrt 
 @api_view(['POST'])
 def register(request):
     global db
@@ -117,8 +124,8 @@ def test(request):
         data.append(user_coordinates)
     try:
         user_location_detail = locationDetail.objects.filter(user = request.user).order_by('-id')[0]
-        user_latitude = user_location_detail.longitude
-        user_longitude = user_location_detail.latitude
+        user_latitude = user_location_detail.latitude
+        user_longitude = user_location_detail.longitude
         user_last_fetch = user_location_detail.last_fetched
     except:
         user_latitude = None
@@ -130,12 +137,13 @@ def test(request):
 @api_view(['POST','GET'])
 @permission_classes([IsAuthenticated])
 def table(request):
+    global R
     data = []
     all_user = extendedUser.objects.filter(~Q(status = 5))
     my_user = extendedUser.objects.get(user = request.user)
     for extend_user in all_user:
         try:
-            location_detail = locationDetail.objects.filter(user = extend_user.user).order_by('-id')[0]
+            location_detail = locationDetail.objects.filter(user = extend_user.user).last()
             extend_user_latitude = location_detail.latitude
             extend_user_longitude = location_detail.longitude
             extend_user_last_fetch = location_detail.last_fetched
@@ -145,16 +153,41 @@ def table(request):
             extend_user_last_fetch = None
         user_coordinates = {'channel_id':extend_user.user.id,'status':extend_user.status,'username':extend_user.user.username,'latitude':extend_user_latitude,'longitude':extend_user_longitude,'last_fetch':extend_user_last_fetch}
         print(extend_user.user.username + " id = " +str(extend_user.user.id))
-        data.append(user_coordinates)
+        if extend_user_latitude != None and extend_user_longitude != None:
+            data.append(user_coordinates)
     try:
-        user_location_detail = locationDetail.objects.filter(user = request.user).order_by('-id')[0]
-        user_latitude = user_location_detail.longitude
-        user_longitude = user_location_detail.latitude
+        user_location_detail = locationDetail.objects.filter(user = request.user).last()
+        user_latitude = user_location_detail.latitude
+        user_longitude = user_location_detail.longitude
         user_last_fetch = user_location_detail.last_fetched
     except:
         user_latitude = None
         user_longitude = None
         user_last_fetch = None 
+    current_lat = user_latitude
+    current_long = user_longitude
+    def distance(lat1, lon1, lat2, lon2):
+        # The math module contains a function named 
+        # radians which converts from degrees to radians. 
+        lon1 = radians(lon1) 
+        lon2 = radians(lon2) 
+        lat1 = radians(lat1) 
+        lat2 = radians(lat2) 
+        
+        # Haversine formula  
+        dlon = lon2 - lon1  
+        dlat = lat2 - lat1 
+        a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    
+        c = 2 * asin(sqrt(a))  
+        
+        # Radius of earth in kilometers. Use 3956 for miles 
+        r = 6371
+        
+        # calculate the result 
+        return(c * r) 
+    if current_lat != None and current_long != None:
+        data = sorted(data, key= lambda d: distance(d["longitude"], d["latitude"], current_lat, current_long),reverse = False)
     user_coordinates = {'channel_id':request.user.id,'status':my_user.status,'username':request.user.username,'latitude':user_latitude,'longitude':user_longitude,'last_fetch':user_last_fetch}
     all_data = {'global_plotted_coordinates':data,'user_plotted_data':user_coordinates}
     return Response(all_data)
