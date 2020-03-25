@@ -21,4 +21,5 @@ urlpatterns = [
     path('inputLocation',views.inputLocation, name= "inputLocation"),
     path('register/',views.register, name= "register"),
     path('updateUserDetail/',views.updateUserDetail,name="updateUserDetail"),
+    path('admin_add_user_detail/',views.admin_add_user_detail, name= "admin_add_user_detail"),
 ]

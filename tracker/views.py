@@ -191,3 +191,34 @@ def table(request):
     user_coordinates = {'channel_id':request.user.id,'status':my_user.status,'username':request.user.username,'latitude':user_latitude,'longitude':user_longitude,'last_fetch':user_last_fetch}
     all_data = {'global_plotted_coordinates':data,'user_plotted_data':user_coordinates}
     return Response(all_data)
+@api_view(['POST','GET'])
+@permission_classes([IsAuthenticated])
+def admin_add_user_detail(request):
+    latitude = request.data['latitude']
+    longitude = request.data['longitude']
+    last_fetch = datetime.now()
+    username = request.data['username']
+    status = request.data['status']
+    my_email = request.data['email']
+    global db
+    #serialized = UserSerializer(data = request.data)
+    data = {}
+    my_username = "autoCreated" + request.data['username']
+    my_password = "auto1234"
+    user =User.objects.create_user(email= my_email, username= my_username, password =my_password)
+    anonymous_extendUser = extendedUser.objects.get(user = user)
+    anonymous_extendUser.status = status
+    anonymous_extendUser.save()
+    anonymous_location = locationDetail(user = user, latitude = latitude, longitude = longitude,last_fetched = last_fetch)
+    anonymous_location.save()
+    data['sucess'] = "anonymous user created"
+    channel= "channel" + str(user.id)
+    print(channel)
+    doc_ref = db.collection(u'main_data').document(channel)
+    doc_ref.set({
+        u'latitude':latitude,
+        u'longitude':longitude,
+        u'last_fetched': str(last_fetch),
+    })
+    return Response(data = data)
+    #return Response(serialized.errors, status= status.HTTP_400_BAD_REQUEST)
