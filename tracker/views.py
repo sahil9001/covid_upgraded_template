@@ -246,8 +246,3 @@ def search_user(request):
         instance_user = {'username':user.username,'id':user.id}
         data.append(instance_user)
     return Response(data)
-
-
-
-
-
