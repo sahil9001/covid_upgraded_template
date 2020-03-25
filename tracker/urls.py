@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.urls import path, re_path
 from . import views
+from .views import pathtracing
+from rest_framework import routers
 urlpatterns = [
     path('test/',views.test, name = "test"),
     path('table/',views.table, name= "table"),
@@ -22,4 +24,5 @@ urlpatterns = [
     path('register/',views.register, name= "register"),
     path('updateUserDetail/',views.updateUserDetail,name="updateUserDetail"),
     path('admin_add_user_detail/',views.admin_add_user_detail, name= "admin_add_user_detail"),
+    path('pathtracing/<int:user_id>/',pathtracing,name = "pathTracing"),
 ]

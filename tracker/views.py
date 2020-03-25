@@ -1,12 +1,16 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+import json
 from accounts.models import extendedUser
 from . models import locationDetail
 import pusher
+from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import permissions
+from rest_framework import authentication
 from django.http import HttpResponse
 from . serializer import locationSerializer,extendedUserSerializer,UserSerializer
 from datetime import datetime
@@ -193,7 +197,7 @@ def table(request):
     return Response(all_data)
 @api_view(['POST','GET'])
 @permission_classes([IsAuthenticated])
-def admin_add_user_detail(request):
+def admin_add_user_detail(request):# admin only view.Add cutom decorator
     latitude = request.data['latitude']
     longitude = request.data['longitude']
     last_fetch = datetime.now()
@@ -222,3 +226,17 @@ def admin_add_user_detail(request):
     })
     return Response(data = data)
     #return Response(serialized.errors, status= status.HTTP_400_BAD_REQUEST)
+@api_view(['POST','GET'])
+@permission_classes([IsAuthenticated])
+def pathtracing(request,user_id):
+    track_user = User.objects.get(id = user_id)
+    all_past_location = locationDetail.objects.filter(user= track_user).order_by('-id')
+    data = []
+    for location in all_past_location:
+        past_loc = {'user':location.user.username,'latitude':location.latitude,'longitude':location.longitude,'last_fetched':str(location.last_fetched),'id':location.id}
+        data.append(past_loc)
+    return Response(data)
+
+
+
+

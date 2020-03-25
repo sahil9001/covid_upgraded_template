@@ -17,13 +17,20 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework.authtoken.views import obtain_auth_token  # <-- Here
+#from tracker.views import pathTracing
 
+from rest_framework.authtoken.views import obtain_auth_token  # <-- Here
+"""
+from rest_framework import routers
+router = routers.DefaultRouter()
+router.register(r'pathtracing/(?P<user_id>[0-9]+)', pathTracing, basename='pathTracing')
+"""
 
 urlpatterns = [
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),  
     path('admin/', admin.site.urls),
     path('tracker/',include('tracker.urls')),
+    #path('my_tracker/',include(router.urls)),
 
 ]
 if settings.DEBUG: #Not for production code
