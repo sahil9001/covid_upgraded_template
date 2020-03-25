@@ -25,7 +25,7 @@ SECRET_KEY = 'nex=om%kw2*0q^f(c1b=^0k%3122csrsh8$#8rp0o%%$df^4+u'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['tuhina840.pythonanywhere.com','127.0.0.1:8000']
 
 
 # Application definition
