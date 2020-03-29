@@ -24,8 +24,9 @@ from firebase_admin import credentials, firestore,db
 import os, sys
 import json
 import ast
-dirname, filename = os.path.split(os.path.abspath(sys.argv[0]))
-covid = os.path.join(dirname, "covid.json")
+script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+rel_path = "covid.json"
+covid = os.path.join(script_dir, rel_path)
 cred = credentials.Certificate(covid)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
@@ -55,6 +56,13 @@ def register(request):
     my_password = request.data['password']
     if serialized.is_valid():
         user =User.objects.create_user(email= my_email, username= my_username, password =my_password)
+        a = extendedUser.objects.get(user = user)
+        try:
+            a.status = request.data['status']
+            a.save()
+        except:
+            a.status = None
+            a.save()
         data['sucess'] = "user created"
         channel= "channel" + str(user.id)
         print(channel)
@@ -147,15 +155,16 @@ def table(request):
     my_user = extendedUser.objects.get(user = request.user)
     for extend_user in all_user:
         try:
-            location_detail = locationDetail.objects.filter(user = extend_user.user).last()
-            extend_user_latitude = location_detail.latitude
-            extend_user_longitude = location_detail.longitude
-            extend_user_last_fetch = location_detail.last_fetched
+            if extend_user.user != request.user:
+                location_detail = locationDetail.objects.filter(user = extend_user.user).last()
+                extend_user_latitude = location_detail.latitude
+                extend_user_longitude = location_detail.longitude
+                extend_user_last_fetch = location_detail.last_fetched
         except:
             extend_user_latitude = None
             extend_user_longitude = None
             extend_user_last_fetch = None
-        user_coordinates = {'channel_id':extend_user.user.id,'status':extend_user.status,'username':extend_user.user.username,'latitude':extend_user_latitude,'longitude':extend_user_longitude,'last_fetch':extend_user_last_fetch}
+        user_coordinates = {'channel_id':extend_user.user.id,'status':extend_user.status,'username':extend_user.user.username,'latitude':extend_user_latitude,'longitude':extend_user_longitude,'last_fetch':str(extend_user_last_fetch)}
         print(extend_user.user.username + " id = " +str(extend_user.user.id))
         if extend_user_latitude != None and extend_user_longitude != None:
             data.append(user_coordinates)
@@ -191,58 +200,74 @@ def table(request):
         # calculate the result 
         return(c * r) 
     if current_lat != None and current_long != None:
-        data = sorted(data, key= lambda d: distance(d["longitude"], d["latitude"], current_lat, current_long),reverse = False)
-    user_coordinates = {'channel_id':request.user.id,'status':my_user.status,'username':request.user.username,'latitude':user_latitude,'longitude':user_longitude,'last_fetch':user_last_fetch}
+        data = sorted(data, key= lambda d: distance(d["latitude"], d["longitude"], current_lat, current_long),reverse = False)
+    user_coordinates = {'channel_id':request.user.id,'status':my_user.status,'username':request.user.username,'latitude':user_latitude,'longitude':user_longitude,'last_fetch':str(user_last_fetch)}
     all_data = {'global_plotted_coordinates':data,'user_plotted_data':user_coordinates}
+    print(all_data)
     return Response(all_data)
 @api_view(['POST','GET'])
 @permission_classes([IsAuthenticated])
 def admin_add_user_detail(request):# admin only view.Add cutom decorator
-    latitude = request.data['latitude']
-    longitude = request.data['longitude']
-    last_fetch = datetime.now()
-    username = request.data['username']
-    status = request.data['status']
-    my_email = request.data['email']
-    global db
-    #serialized = UserSerializer(data = request.data)
-    data = {}
-    my_username = "autoCreated" + request.data['username']
-    my_password = "auto1234"
-    user =User.objects.create_user(email= my_email, username= my_username, password =my_password)
-    anonymous_extendUser = extendedUser.objects.get(user = user)
-    anonymous_extendUser.status = status
-    anonymous_extendUser.save()
-    anonymous_location = locationDetail(user = user, latitude = latitude, longitude = longitude,last_fetched = last_fetch)
-    anonymous_location.save()
-    data['sucess'] = "anonymous user created"
-    channel= "channel" + str(user.id)
-    print(channel)
-    doc_ref = db.collection(u'main_data').document(channel)
-    doc_ref.set({
-        u'latitude':latitude,
-        u'longitude':longitude,
-        u'last_fetched': str(last_fetch),
-    })
-    return Response(data = data)
-    #return Response(serialized.errors, status= status.HTTP_400_BAD_REQUEST)
+    if request.user.is_staff:
+        latitude = request.data['latitude']
+        longitude = request.data['longitude']
+        last_fetch = datetime.now()
+        username = request.data['username']
+        status = request.data['status']
+        my_email = request.data['email']
+        global db
+        #serialized = UserSerializer(data = request.data)
+        data = {}
+        my_username = "autoCreated" + request.data['username']
+        my_password = "auto1234"
+        user =User.objects.create_user(email= my_email, username= my_username, password =my_password)
+        anonymous_extendUser = extendedUser.objects.get(user = user)
+        anonymous_extendUser.status = status
+        anonymous_extendUser.save()
+        anonymous_location = locationDetail(user = user, latitude = latitude, longitude = longitude,last_fetched = last_fetch)
+        anonymous_location.save()
+        data['sucess'] = "anonymous user created"
+        channel= "channel" + str(user.id)
+        print(channel)
+        doc_ref = db.collection(u'main_data').document(channel)
+        doc_ref.set({
+            u'latitude':latitude,
+            u'longitude':longitude,
+            u'last_fetched': str(last_fetch),
+        })
+        return Response(data = data)
+    else:
+        data = {}
+        data['error'] = "not a staff user"
+        from rest_framework import status
+        return Response(data= data, status= status.HTTP_400_BAD_REQUEST)
 @api_view(['POST','GET'])
 @permission_classes([IsAuthenticated])
 def pathtracing(request,user_id):
-    track_user = User.objects.get(id = user_id)
-    all_past_location = locationDetail.objects.filter(user= track_user).order_by('-id')
-    data = []
-    for location in all_past_location:
-        past_loc = {'user':location.user.username,'latitude':location.latitude,'longitude':location.longitude,'last_fetched':str(location.last_fetched),'id':location.id}
-        data.append(past_loc)
-    return Response(data)
+    if request.user.is_staff:
+        track_user = User.objects.get(id = user_id)
+        all_past_location = locationDetail.objects.filter(user= track_user).order_by('-id')
+        data = []
+        for location in all_past_location:
+            past_loc = {'user':location.user.username,'latitude':location.latitude,'longitude':location.longitude,'last_fetched':str(location.last_fetched),'id':location.id}
+            data.append(past_loc)
+        return Response(data)
+    else:
+        data = {}
+        data['error'] = "not a staff user"
+        return Response(data= data, status= status.HTTP_400_BAD_REQUEST)
 @api_view(['POST','GET'])
 @permission_classes([IsAuthenticated])
 def search_user(request):
-    data = []
-    uname = request.data['username']
-    all_users = all_user = User.objects.filter(username__contains= uname)[:10]
-    for user in all_user:
-        instance_user = {'username':user.username,'id':user.id}
-        data.append(instance_user)
-    return Response(data)
+    if request.user.is_staff:
+        data = []
+        uname = request.data['username']
+        all_users = all_user = User.objects.filter(username__contains= uname)[:10]
+        for user in all_user:
+            instance_user = {'username':user.username,'id':user.id}
+            data.append(instance_user)
+        return Response(data)
+    else:
+        data = {}
+        data['error'] = "not a staff user"
+        return Response(data= data, status= status.HTTP_400_BAD_REQUEST)
