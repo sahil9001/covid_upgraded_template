@@ -1,26 +1,25 @@
-<!DOCTYPE html>
-<head>
-  <title>Test</title>
-  <script src="https://js.pusher.com/5.1/pusher.min.js"></script>
-  <script>
+<script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.27.4.js"></script>
+<script>
+      pubnub = new PubNub({
+        publishKey : 'pub-c-82513d19-287e-4ed8-b139-88bc00385dfd',
+        subscribeKey : 'sub-c-a5e842ac-71ca-11ea-a44c-76a98e4db888',
+        uuid: "abc.xyz"
+    })
+    pubnub.subscribe({
+    channels: ['channel1'],
+});
+pubnub.addListener({
+    message: function(m) {
+        // handle message
+        var channelName = m.channel; // The channel for which the message belongs
+        var channelGroup = m.subscription; // The channel group or wildcard subscription match (if exists)
+        var pubTT = m.timetoken; // Publish timetoken
+        var msg = m.message; // The Payload
+        console.log(msg)
+        var publisher = m.publisher; //The Publisher
 
-    // Enable pusher logging - don't include this in production
-    Pusher.logToConsole = true;
+    },
+  });
 
-    var pusher = new Pusher('c73ea8196f369f3e7364', {
-      cluster: 'ap2',
-      forceTLS: true
-    });
-
-    var channel = pusher.subscribe('channel1');
-    channel.bind('my-event', function(data) {
-      alert(JSON.stringify(data));
-    });
-  </script>
-</head>
-<body>
-  <h1>Pusher Test</h1>
-  <p>
-    Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test 
-  </p>
-</body>
+    
+</script>

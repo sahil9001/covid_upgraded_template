@@ -1,3 +1,14 @@
+######pubnub
+from pubnub.callbacks import SubscribeCallback
+from pubnub.enums import PNStatusCategory
+from pubnub.pnconfiguration import PNConfiguration
+from pubnub.pubnub import PubNub
+pnconfig = PNConfiguration()
+pnconfig.subscribe_key = 'sub-c-a5e842ac-71ca-11ea-a44c-76a98e4db888'
+pnconfig.publish_key = 'pub-c-82513d19-287e-4ed8-b139-88bc00385dfd'
+pnconfig.uuid = "abc.xyz"
+pubnub = PubNub(pnconfig)
+###################
 from django.shortcuts import render
 from django.http import HttpResponse
 import json
@@ -38,6 +49,7 @@ pusher_client = pusher.Pusher(
   cluster='ap2',
   ssl=True
 )
+
 ####for nearest point import
 from django.db.models.functions import Radians, Power, Sin, Cos, ATan2, Sqrt, Radians
 from django.db.models import F
@@ -94,6 +106,7 @@ def updateUserDetail(request):
 @api_view(['POST','GET'])
 @permission_classes([IsAuthenticated])
 def inputLocation(request):
+    global pubnub
     global db
     data = {}
     user = request.user
@@ -108,11 +121,17 @@ def inputLocation(request):
         channel = "channel"+ str(request.user.id)
         print(channel)
         doc_ref = db.collection(u'main_data').document(channel)
+        msg = {
+            'latitude':new_location.latitude,
+            'longitude':new_location.longitude,
+            'last_fetched': str(last_date),
+        }
         doc_ref.set({
             u'latitude':new_location.latitude,
             u'longitude':new_location.longitude,
             u'last_fetched': str(last_date),
         })
+        pubnub.publish().channel(channel).message(msg)
         pusher_client.trigger(channel, 'my-event', {'latitude': new_location.latitude,'longitude':new_location.longitude,'last_fetch':str(last_date)})
         return Response(data = data ,status= status.HTTP_200_OK)
     return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
