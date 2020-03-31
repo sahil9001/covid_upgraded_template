@@ -26,4 +26,9 @@ urlpatterns = [
     path('admin_add_user_detail/',views.admin_add_user_detail, name= "admin_add_user_detail"),
     path('pathtracing/<int:user_id>/',pathtracing,name = "pathTracing"),
     path('search_user/',views.search_user, name = "search_user"),
+    path('trace/<int:user_id>/',views.template_pathtracing,name= "template_pathtracing"),
+    path('add/',views.template_admin_add_user_detail,name="add"),
+    path('api_add/<str:latitude>/<str:longitude>/<int:status>/<str:username>/<str:my_email>/', views.api_admin_add_user_detail,name="api_add"),
+    path('template_search_user/<str:username>/',views.template_search_user,name="template_search_user"),
+    path('search/',views.search_page,name="search_page")
 ]

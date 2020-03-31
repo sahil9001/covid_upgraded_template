@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from tracker.views import home
 #from tracker.views import pathTracing
 
 from rest_framework.authtoken.views import obtain_auth_token  # <-- Here
@@ -30,6 +31,7 @@ urlpatterns = [
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),  
     path('admin/', admin.site.urls),
     path('tracker/',include('tracker.urls')),
+    path('',home,name="home"),
     #path('my_tracker/',include(router.urls)),
 
 ]

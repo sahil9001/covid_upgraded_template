@@ -1,14 +1,4 @@
-######pubnub
-from pubnub.callbacks import SubscribeCallback
-from pubnub.enums import PNStatusCategory
-from pubnub.pnconfiguration import PNConfiguration
-from pubnub.pubnub import PubNub
-pnconfig = PNConfiguration()
-pnconfig.subscribe_key = 'sub-c-a5e842ac-71ca-11ea-a44c-76a98e4db888'
-pnconfig.publish_key = 'pub-c-82513d19-287e-4ed8-b139-88bc00385dfd'
-pnconfig.uuid = "abc.xyz"
-pubnub = PubNub(pnconfig)
-###################
+
 from django.shortcuts import render
 from django.http import HttpResponse
 import json
@@ -16,6 +6,8 @@ from accounts.models import extendedUser
 from . models import locationDetail
 import pusher
 from rest_framework import viewsets
+from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -29,6 +21,8 @@ from django.contrib.auth.models import User
 import pytz
 from django.utils import timezone
 from django.db.models import Q
+from django.views.decorators.csrf import csrf_exempt
+
 ####firebase
 import firebase_admin
 from firebase_admin import credentials, firestore,db
@@ -36,11 +30,24 @@ import os, sys
 import json
 import ast
 script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 rel_path = "covid.json"
 covid = os.path.join(script_dir, rel_path)
 cred = credentials.Certificate(covid)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
+"""
+#####################covid2
+
+script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+rel_path = "covid2.json"
+covid2 = os.path.join(script_dir, rel_path)
+cred2 = credentials.Certificate(covid2)
+firebase_admin.initialize_app(cred2)
+db2 = firestore.client()
+
+###########################
+"""
 ###pusher
 pusher_client = pusher.Pusher(
   app_id='967595',
@@ -78,7 +85,7 @@ def register(request):
         data['sucess'] = "user created"
         channel= "channel" + str(user.id)
         print(channel)
-        doc_ref = db.collection(u'main_data').document(channel)
+        doc_ref = db.collection(channel).document(channel)
         doc_ref.set({
             u'latitude':None,
             u'longitude':None,
@@ -120,18 +127,22 @@ def inputLocation(request):
         data['success'] = "new location saved"
         channel = "channel"+ str(request.user.id)
         print(channel)
-        doc_ref = db.collection(u'main_data').document(channel)
-        msg = {
-            'latitude':new_location.latitude,
-            'longitude':new_location.longitude,
-            'last_fetched': str(last_date),
-        }
+        #####db2
+        doc_ref = db.collection(channel).document(channel)
         doc_ref.set({
             u'latitude':new_location.latitude,
             u'longitude':new_location.longitude,
             u'last_fetched': str(last_date),
         })
-        pubnub.publish().channel(channel).message(msg)
+        ###############end db2
+        """
+        doc_ref = db.collection(u'main_data').document(channel)
+        doc_ref.set({
+            u'latitude':new_location.latitude,
+            u'longitude':new_location.longitude,
+            u'last_fetched': str(last_date),
+        })
+        """
         pusher_client.trigger(channel, 'my-event', {'latitude': new_location.latitude,'longitude':new_location.longitude,'last_fetch':str(last_date)})
         return Response(data = data ,status= status.HTTP_200_OK)
     return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
@@ -290,3 +301,114 @@ def search_user(request):
         data = {}
         data['error'] = "not a staff user"
         return Response(data= data, status= status.HTTP_400_BAD_REQUEST)
+
+def template_search_user(request,username):
+    if request.user.is_staff:
+        data = []
+        uname = username
+        all_users = all_user = User.objects.filter(username__contains= uname)[:10]
+        for user in all_user:
+            instance_user = {'username':user.username,'id':user.id}
+            data.append(instance_user)
+        return HttpResponse(data)
+    else:
+        data = {}
+        data['error'] = "not a staff user"
+        return HttpResponse("error")
+@login_required
+def template_pathtracing(request,user_id):
+    if request.user.is_staff:
+        try:
+            track_user = User.objects.get(id = user_id)
+        except:
+            raise Http404("User does not exist")
+        all_past_location = locationDetail.objects.filter(user= track_user).order_by('-id')
+        data = []
+        for location in all_past_location:
+            past_loc = {'user':location.user.username,'latitude':location.latitude,'longitude':location.longitude,'last_fetched':str(location.last_fetched),'id':location.id}
+            data.append(past_loc)
+        try:
+            first_data = data[0]
+        except:
+            first_data = None
+        return render(request,'pathTracing.html',{'all_data':data,'first_data':first_data,'username':track_user.username})
+    else:
+        data = {}
+        data['error'] = "not a staff user"
+        raise Http404("Not a Staff User")
+
+@login_required
+def template_admin_add_user_detail(request):# admin only view.Add cutom decorator
+    if request.user.is_staff:
+        if 'add' in request.POST:
+            latitude = request.POST['latitude']
+            longitude = request.POST['longitude']
+            last_fetch = datetime.now()
+            username = request.POST['username']
+            status = request.POST['status']
+            my_email = request.POST['email']
+            global db
+            #serialized = UserSerializer(data = request.data)
+            data = {}
+            my_username = "autoCreated" + request.POST['username']
+            my_password = "auto1234"
+            user =User.objects.create_user(email= my_email, username= my_username, password =my_password)
+            anonymous_extendUser = extendedUser.objects.get(user = user)
+            anonymous_extendUser.status = status
+            anonymous_extendUser.save()
+            anonymous_location = locationDetail(user = user, latitude = latitude, longitude = longitude,last_fetched = last_fetch)
+            anonymous_location.save()
+            data['sucess'] = "anonymous user created"
+            channel= "channel" + str(user.id)
+            print(channel)
+            doc_ref = db.collection(u'main_data').document(channel)
+            doc_ref.set({
+                u'latitude':latitude,
+                u'longitude':longitude,
+                u'last_fetched': str(last_fetch),
+            })
+            return render(request,'admin_add_user.html',{'msg':"New User Added"})
+        return render(request,'admin_add_user.html')
+    else:
+        data = {}
+        data['error'] = "not a staff user"
+        from rest_framework import status
+        return render(request,'admin_add_user.html',{'msg':"Not a staff user"})
+@login_required
+def search_page(request):
+    return render(request,'search.html')
+def home(request):
+    return render(request,'home.html')
+@csrf_exempt
+def api_admin_add_user_detail(request,latitude,longitude,status,username,my_email):# admin only view.Add cutom decorator
+    if request.user.is_staff:
+        latitude = float(latitude)
+        longitude = float(longitude)
+        global db
+        #serialized = UserSerializer(data = request.data)
+        data = {}
+        my_username = "autoCreated" + username
+        my_password = "auto1234"
+        user =User.objects.create_user(email= my_email, username= my_username, password =my_password)
+        anonymous_extendUser = extendedUser.objects.get(user = user)
+        anonymous_extendUser.status = status
+        anonymous_extendUser.save()
+        last_fetch = datetime.now()
+        anonymous_location = locationDetail(user = user, latitude = latitude, longitude = longitude,last_fetched = last_fetch)
+        anonymous_location.save()
+        data['sucess'] = "anonymous user created"
+        channel= "channel" + str(user.id)
+        print(channel)
+        doc_ref = db.collection(u'main_data').document(channel)
+        doc_ref.set({
+            u'latitude':latitude,
+            u'longitude':longitude,
+            u'last_fetched': str(last_fetch),
+        })
+        return HttpResponse("added")
+    else:
+        data = {}
+        data['error'] = "not a staff user"
+        from rest_framework import status
+        return HttpResponse("not_staff")
+
