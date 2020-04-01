@@ -30,5 +30,6 @@ urlpatterns = [
     path('add/',views.template_admin_add_user_detail,name="add"),
     path('api_add/<str:latitude>/<str:longitude>/<int:status>/<str:username>/<str:my_email>/', views.api_admin_add_user_detail,name="api_add"),
     path('template_search_user/<str:username>/',views.template_search_user,name="template_search_user"),
-    path('search/',views.search_page,name="search_page")
+    path('search/',views.search_page,name="search_page"),
+    path('user_individual_track/',views.user_individual_track, name="user_individual_track"),
 ]

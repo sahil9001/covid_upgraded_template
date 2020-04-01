@@ -411,4 +411,20 @@ def api_admin_add_user_detail(request,latitude,longitude,status,username,my_emai
         data['error'] = "not a staff user"
         from rest_framework import status
         return HttpResponse("not_staff")
-
+@api_view(['POST','GET'])
+@permission_classes([IsAuthenticated])
+def user_individual_track(request):
+    try:
+        my_user = User.objects.get(id = request.data['channel'])
+    except:
+        data = {}
+        data['error'] = "user not found"
+        return Response(data= data, status= status.HTTP_400_BAD_REQUEST)
+    location_detail = locationDetail.objects.filter(user = my_user).last()
+    user_latitude = location_detail.latitude
+    user_longitude = location_detail.longitude
+    data = {
+        'latitude' : user_latitude,
+        'longitude' : user_longitude
+    }
+    return Response(data = data ,status= status.HTTP_200_OK)
