@@ -1,5 +1,5 @@
 
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponse
 import json
 from accounts.models import extendedUser
@@ -17,7 +17,7 @@ from rest_framework import authentication
 from django.http import HttpResponse
 from . serializer import locationSerializer,extendedUserSerializer,UserSerializer
 from datetime import datetime
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, auth
 import pytz
 from django.utils import timezone
 from django.db.models import Q
@@ -306,11 +306,25 @@ def template_search_user(request,username):
     if request.user.is_staff:
         data = []
         uname = username
-        all_users = all_user = User.objects.filter(username__contains= uname)[:10]
+        queryset = (Q(username__icontains= uname))
+        all_users = all_user = User.objects.filter(queryset).distinct()
         for user in all_user:
-            instance_user = {'username':user.username,'id':user.id}
+            type = None
+            if user.extendedUser.status == 1:
+                type = "COVID POSITIVE"
+            elif user.extendedUser.status == 2:
+                type = "Show Symptoms"
+            elif user.extendedUser.status == 3:
+                type = "Travel History Abroad"
+            elif user.extendedUser.status == 4:
+                type = "Close Contact"
+            elif user.extendedUser.status == 5:
+                type = "Normal User"
+            else:
+                type = "Unknown" 
+            instance_user = {'username':user.username,'id':user.id,'status':type}
             data.append(instance_user)
-        return HttpResponse(data)
+        return HttpResponse(json.dumps(data))
     else:
         data = {}
         data['error'] = "not a staff user"
@@ -331,7 +345,11 @@ def template_pathtracing(request,user_id):
             first_data = data[0]
         except:
             first_data = None
-        return render(request,'pathTracing.html',{'all_data':data,'first_data':first_data,'username':track_user.username})
+        try:
+            first_location = data[0]
+        except:
+            first_location = None
+        return render(request,'pathTracing.html',{'all_data':data,'first_data':first_data,'username':track_user.username,'first_location':first_location})
     else:
         data = {}
         data['error'] = "not a staff user"
@@ -428,3 +446,20 @@ def user_individual_track(request):
         'longitude' : user_longitude
     }
     return Response(data = data ,status= status.HTTP_200_OK)
+def login(request):
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = auth.authenticate(username = username, password = password)
+        if user != None :
+            if user.is_staff:
+                auth.login(request,user)
+                return redirect('/tracker/add/')
+            else:
+                return render(request,'login.html',{'error_message':"Not a staff user"})
+
+        else:
+            return render(request, 'login.html', {'error_message': "Invalid Credentials"})
+    return render(request,'login.html')
+def add(request):
+    return render(request,'admin_add_user.html')

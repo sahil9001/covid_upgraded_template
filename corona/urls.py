@@ -17,9 +17,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from tracker.views import home
-#from tracker.views import pathTracing
+from tracker.views import home,login
+from django.contrib.auth.views import LogoutView
 
+#from tracker.views import pathTracing
 from rest_framework.authtoken.views import obtain_auth_token  # <-- Here
 """
 from rest_framework import routers
@@ -32,6 +33,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('tracker/',include('tracker.urls')),
     path('',home,name="home"),
+    path('login/',login,name="login"),
+    path('logout/', LogoutView.as_view(), name="logout"),
     #path('my_tracker/',include(router.urls)),
 
 ]

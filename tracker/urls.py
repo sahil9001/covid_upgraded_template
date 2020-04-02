@@ -17,7 +17,10 @@ from django.urls import path, re_path
 from . import views
 from .views import pathtracing
 from rest_framework import routers
+from django.contrib.auth.views import LogoutView
 urlpatterns = [
+    path('add/',views.add, name="add"),
+    path('logout/', LogoutView.as_view(), name="logout"),
     path('test/',views.test, name = "test"),
     path('table/',views.table, name= "table"),
     path('inputLocation',views.inputLocation, name= "inputLocation"),

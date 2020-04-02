@@ -150,3 +150,4 @@ STATIC_URL = '/home/tuhina840/corona/static/'
 STATIC_ROOT = os.path.join(SETTINGS_PATH, 'static')
 MEDIA_ROOT = os.path.join(SETTINGS_PATH, 'media')#server side
 MEDIA_URL = '/media/'#client side
+LOGOUT_REDIRECT_URL = '/'

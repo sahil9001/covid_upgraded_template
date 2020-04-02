@@ -7,7 +7,151 @@
   {% load static %}
   <!-- Site made with Mobirise Website Builder v4.12.3, https://mobirise.com -->
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<style>
+  @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100);
+
+body {
+  background-color: #eeeeee;
+  font-family: "Roboto", helvetica, arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  text-rendering: optimizeLegibility;
+}
+
+div.table-title {
+   display: block;
+  margin: auto;
+  max-width: 600px;
+  padding:5px;
+  width: 100%;
+}
+
+.table-title h3 {
+   color: #fafafa;
+   font-size: 30px;
+   font-weight: 400;
+   font-style:normal;
+   font-family: "Roboto", helvetica, arial, sans-serif;
+   text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+   text-transform:uppercase;
+}
+
+
+/*** Table Styles **/
+
+.table-fill {
+  background: white;
+  border-radius:3px;
+  border-collapse: collapse;
+  height: 320px;
+  margin: auto;
+  max-width: 600px;
+  padding:5px;
+  width: 100%;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  animation: float 5s infinite;
+}
+ 
+th {
+  color:#D5DDE5;;
+  background:#1b1e24;
+  border-bottom:4px solid #9ea7af;
+  border-right: 1px solid #343a45;
+  font-size:23px;
+  font-weight: 100;
+  padding:24px;
+  text-align:left;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  vertical-align:middle;
+}
+
+th:first-child {
+  border-top-left-radius:3px;
+}
+ 
+th:last-child {
+  border-top-right-radius:3px;
+  border-right:none;
+}
+  
+tr {
+  border-top: 1px solid #C1C3D1;
+  border-bottom-: 1px solid #C1C3D1;
+  color:#666B85;
+  font-size:16px;
+  font-weight:normal;
+  text-shadow: 0 1px 1px rgba(256, 256, 256, 0.1);
+}
+ 
+tr:hover td {
+  background:#4E5066;
+  color:#FFFFFF;
+  border-top: 1px solid #22262e;
+}
+ 
+tr:first-child {
+  border-top:none;
+}
+
+tr:last-child {
+  border-bottom:none;
+}
+ 
+tr:nth-child(odd) td {
+  background:#EBEBEB;
+}
+ 
+tr:nth-child(odd):hover td {
+  background:#4E5066;
+}
+
+tr:last-child td:first-child {
+  border-bottom-left-radius:3px;
+}
+ 
+tr:last-child td:last-child {
+  border-bottom-right-radius:3px;
+}
+ 
+td {
+  background:#FFFFFF;
+  padding:20px;
+  text-align:left;
+  vertical-align:middle;
+  font-weight:300;
+  font-size:18px;
+  text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+  border-right: 1px solid #C1C3D1;
+}
+
+td:last-child {
+  border-right: 0px;
+}
+
+th.text-left {
+  text-align: left;
+}
+
+th.text-center {
+  text-align: center;
+}
+
+th.text-right {
+  text-align: right;
+}
+
+td.text-left {
+  text-align: left;
+}
+
+td.text-center {
+  text-align: center;
+}
+
+td.text-right {
+  text-align: right;
+}
+</style>  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="generator" content="Mobirise v4.12.3, mobirise.com">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
   <link rel="shortcut icon" href="{% static "assets/images/logo4.png" %}" type="image/x-icon">
@@ -31,6 +175,7 @@ body{font-family: Roboto;}blockquote{border-color: #4ea2e3;}div[submit-success] 
   
   <title>Home</title>
   {% load static %}
+  <link rel="stylesheet" href="{% static "table.css" %}">
   <link rel="stylesheet" href="{% static "assets/bootstrap/css/bootstrap.min.css" %}">
   <link rel="stylesheet" href="{% static "assets/bootstrap/css/bootstrap-grid.min.css" %}">
   <link rel="stylesheet" href="{% static "assets/bootstrap/css/bootstrap-reboot.min.css" %}">
@@ -43,7 +188,7 @@ body{font-family: Roboto;}blockquote{border-color: #4ea2e3;}div[submit-success] 
   
 </head>
 <body>
-    <div class="container">
+    <div class="container" style="margin-top: 6%;">
         <div class="row justify-content-center">
             <div class="title col-12 col-lg-8">
                 <h2 class="align-center pb-2 mbr-fonts-style display-2">
@@ -72,57 +217,21 @@ body{font-family: Roboto;}blockquote{border-color: #4ea2e3;}div[submit-success] 
         </div>
     </div>
 </section>
-
-<section class="engine"><a href="https://mobirise.info/t">free amp templates</a></section><section class="section-table cid-rUNbE2EB6Y" id="table1-2">
-
+<center>
+<table class="table-fill">
+  <thead>
+  <tr>
+  <th class="text-left">Username</th>
+  <th class="text-left">Type</th>
+  </tr>
+  </thead>
+  <tbody class="table-hover" id="myTableRow">
+    <!--for-->
   
-  
-  <div class="container container-table">
-      <div class="table-wrapper">
-        <div class="container">
-          <div class="row search">
-            <div class="col-md-6"></div>
-            <div class="col-md-6">
-            </div>
-          </div>
-        </div>
-
-        <div class="container scroll">
-          <table class="table isSearch" cellspacing="0">
-            <thead>
-              <tr class="table-heads ">
-                  
-                  
-                  
-                  
-              <th class="head-item mbr-fonts-style display-7">
-                      NAME</th><th class="head-item mbr-fonts-style display-7">
-                      Status</th><th class="head-item mbr-fonts-style display-7">
-            </thead>
-
-            <tbody id="myTableBody">
-        
-
-          </table>
-        </div>
-        <div class="container table-info-container">
-          <div class="row info">
-            <div class="col-md-6">
-              <div class="dataTables_info mbr-fonts-style display-7">
-                <span class="infoBefore">Showing</span>
-                <span class="inactive infoRows"></span>
-                <span class="infoAfter">entries</span>
-                <span class="infoFilteredBefore">(filtered from</span>
-                <span class="inactive infoRows"></span>
-                <span class="infoFilteredAfter"> total entries)</span>
-              </div>
-            </div>
-            <div class="col-md-6"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-</section>
+  <!--endfor-->
+  </tbody>
+  </table>
+</center>
 
 {% load static %} 
   <script src="{% static "assets/web/assets/jquery/jquery.min.js" %}"></script>
@@ -137,36 +246,35 @@ body{font-family: Roboto;}blockquote{border-color: #4ea2e3;}div[submit-success] 
   <script>
     function search(text)
     {
-      alert(text.value);
-      body = document.getElementById('myTableBody')
-      //ajax here
-      $.ajax({
-            url: '/tracker/template_search_user/'+text.value+'/',
-            type: 'GET',
-            dataType: 'json',
-            contentType: 'application/json; charset=utf-8',
-            success: function (result) {
-              alert(result)
-               all_data = eval(result)
-               for(i=0;i< all_data.length();i++)
-               {
-                  body.innerHTML +=`
-                    <tr>
-                        <td>`+ all_data[i]['username'] + `</td> 
-                        <td> `+ 1 + `</td>
-                    </tr>
-                  `
-               }
- 
-            },
-            error: function (data) {
-                alert("not found")
+      //alert(text.value);
+      rows = document.getElementById('myTableRow')
+      //ajax here    
+        var url = "/tracker/template_search_user/"+text.value+"/"
+        var req = new XMLHttpRequest();
+        req.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              //alert("sucessful request")
+                var data = eval(req.responseText)
+                //alert(data)
+              rows.innerHTML = ``
+              for (i=0;i<data.length;i++)
+              {
+                rows.innerHTML += `
+                <tr>
+                <td><a href="/tracker/trace/`+data[i]['id']+`">`+ data[i]['username']+ `</a></td><td>`+ data[i]['status'] +`</td>
+                </tr>
+                `
+              }
+                
             }
-        });
+        };
+        req.open("GET", url, true);
+        req.send();
     }
     
   </script>
   {% endblock body %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 
 </body>
 </html>
