@@ -1,4 +1,3 @@
-
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 import json
@@ -30,7 +29,6 @@ import os, sys
 import json
 import ast
 script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 rel_path = "covid.json"
 covid = os.path.join(script_dir, rel_path)
 cred = credentials.Certificate(covid)
