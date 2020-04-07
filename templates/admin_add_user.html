@@ -1,8 +1,11 @@
+
+
 {% extends 'base.html' %}
   <!-- AMP plug -->
     
 
 {% block body %}
+{% comment %}
   <section class="engine"><a href="https://mobirise.info/p">site templates free download</a></section><section class="contact1 cid-rUN5CKHn0v" id="contacts1-b">
 
     
@@ -90,9 +93,64 @@
         <option value="5">Normal User</option>
     </select></center>
 </section>
+{% endcomment %}
+<style>
+     #form-header{
+        width:100vw;
+         padding-Left:20vw ;
+         padding-Right:20vw;
+         color:black;
+         padding-Top:10vh;
+    }
+    #register{
+        color: black;
+        font-size: 50px;
+    }
+    
+    /*input{
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }*/
+</style>
+<form id="form-header" >
+    <p id="register"><b>Register</b></p><br/>
+    <div class="form-group">
+<label for="username" >Name</label>
+<input type="text" class="form-control" id="username" placeholder="Enter Name"type="text" name="username" />
+</div>
+<div class="form-group">
+<label for="email" >Email address</label>
+<input type="email" class="form-control" id="email" placeholder="name@example.com" type="text" name="email" />
+</div>
+<div class="form-group">
+<label for="contact1" >Contact</label>
+<input type="number" class="form-control" id="contact1" placeholder="Enter Contact" type="text" name="contact"/>
+</div>
+<div class="form-group">
+<label for="status" >Status</label>
+<select class="form-control" id="status" type="text" name="status" >
+<option value="1">1. Corona Virus Positive</option>
+<option value="2">2.Shows Symtoms</option>
+<option value="3">3. Travel History Abroad</option>
+<option value="4">4. Close Contact</option>
+<option value="5">5. Normal User</option>
+</select>
+</div>
+
+<div class="form-group">
+<label for="latitude" >Latitude</label>
+<input type="string" class="form-control" id="latitude" placeholder="Enter Latitude" type="text" name="latitude" />
+</div>
+<div class="form-group">
+<label for="longitude">Longitude</label>
+<input type="string" class="form-control" id="longitude" placeholder="Enter Longitude" type="text" name="longitude" />
+</div>
+
 <div class="mbr-section-btn align-center field mbr-col-sm-12 mbr-col-md-12 mbr-col-auto">
     <button type="submit" class="btn btn-primary btn-form display-4" onclick="submitform()">SUBMIT </button>
 </div>
+</form>
+
 
 <section class="map cid-rUN5LT3dFx" id="map1-d">
 
@@ -107,6 +165,7 @@
     </div>
 </section>
 <style>
+   
     /* Set the size of the div element that contains the map */
    #map {
      height: 400px;  /* The height is 400 pixels */

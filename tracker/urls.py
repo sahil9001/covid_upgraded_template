@@ -20,6 +20,7 @@ from rest_framework import routers
 from django.contrib.auth.views import LogoutView
 urlpatterns = [
     path('add/',views.add, name="add"),
+     path('dashboard/',views.dashboard, name="dashboard"),
     path('logout/', LogoutView.as_view(), name="logout"),
     path('test/',views.test, name = "test"),
     path('table/',views.table, name= "table"),

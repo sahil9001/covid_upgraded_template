@@ -461,3 +461,5 @@ def login(request):
     return render(request,'login.html')
 def add(request):
     return render(request,'admin_add_user.html')
+def dashboard(request):
+    return render(request,'dashboard.html')
