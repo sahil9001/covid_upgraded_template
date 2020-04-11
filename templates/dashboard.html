@@ -1,9 +1,169 @@
 {% extends 'base.html' %}
 {% block body %}
 
-<script>
- 
-   
-</script>
-</html>
+<body id="page-top">
+    <div id="wrapper">
+
+
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+
+                <div class="container">
+                    <div class="column">
+                        <div class="container-fluid">
+                            <div class="d-sm-flex justify-content-between align-items-center mb-4"></div>
+                            <div class="row">
+                                <div class="col-md-6 col-xl-3 mb-4">
+                                    <div class="card shadow border-left-primary py-2 animated fadeInUp">
+                                        <div class="card-body">
+                                            <div class="row align-items-center no-gutters">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-uppercase text-primary font-weight-bold text-xs mb-1">
+                                                        <span>TOTAL CASES(ACTIVE)</span></div>
+                                                    <div class="text-dark font-weight-bold h5 mb-0">
+                                                        <span>{{active}}</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-3 mb-4">
+                                    <div class="card shadow border-left-success py-2 animated fadeInUp">
+                                        <div class="card-body">
+                                            <div class="row align-items-center no-gutters">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-uppercase text-success font-weight-bold text-xs mb-1">
+                                                        <span>TOtal recovered</span></div>
+                                                    <div class="text-dark font-weight-bold h5 mb-0"><span>{cured}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-3 mb-4">
+                                    <div class="card shadow border-left-info py-2 animated fadeInUp">
+                                        <div class="card-body">
+                                            <div class="row align-items-center no-gutters">
+                                                <div class="col mr-2">
+                                                    <div class="text-uppercase text-info font-weight-bold text-xs mb-1">
+                                                        <span>TOtal deceased</span></div>
+                                                    <div class="row no-gutters align-items-center">
+                                                        <div class="col-auto">
+                                                            <div class="text-dark font-weight-bold h5 mb-0 mr-3">
+                                                                <span>{dead}</span></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg col-xl">
+                                    <div class="card shadow mb-4 animated fadeInUp">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h6 class="text-primary font-weight-bold m-0">Statistics</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <canvas id="chart" class="chart-area" style="position: relative;">
+
+                                        </div>
+                                        <script>
+                                            async function drawChart() {
+                                                const url = "https://api.covid19india.org/data.json";
+                                                let obj = [];
+                                                let objd = []
+                                                await fetch(url)
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        data['cases_time_series'].forEach(ele => {
+                                                            obj.push(ele.date)
+                                                            objd.push(ele.totalconfirmed)
+                                                        })
+                                                        console.log(obj)
+                                                    })
+                                                    .catch(error => console.error(error))
+                                                var ctx = document.getElementById('chart').getContext('2d');
+                                                var myChart = new Chart(ctx, {
+                                                    type: 'line',
+                                                    data: {
+                                                        labels: obj,
+                                                        datasets: [{
+                                                            fill: true,
+                                                            backgroundColor: "rgba(65, 131, 215, 0.5)",
+                                                            label: "Active cases",
+                                                            data: objd
+                                                        }]
+                                                    },
+                                                    options: {
+                                                        responsive: true,
+                                                        scales: {
+                                                            xAxes: [
+                                                                {
+                                                                    ticks: {
+                                                                        display: true,
+                                                                        autoSkip: true,
+                                                                        maxTicksLimit: 10
+                                                                    }
+                                                                }
+                                                            ],
+                                                            yAxes: [{
+                                                                ticks: {
+                                                                    display: true,
+                                                                    autoSkip: true,
+                                                                    maxTicksLimit: 6
+                                                                }
+                                                            }]
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                            drawChart();
+                                        </script>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg col-xl">
+                                <div class="card shadow mb-4 animated fadeInUp">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="text-primary font-weight-bold m-0">Map</h6>
+
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-area">
+
+                                            <div id="visualization">
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="bg-white sticky-footer">
+                    <div class="container my-auto">
+                        <div class="text-center my-auto copyright"><span>Copyright © Brand 2020</span></div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+    <a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+</body>
 {% endblock body %}
