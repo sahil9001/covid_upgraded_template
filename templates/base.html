@@ -222,7 +222,7 @@ a, a:hover, a:focus {
 
 #sidebar ul li.active > a, a[aria-expanded="true"] {
     color: #fff;
-    background: #6d7fcc;
+    /*background: #6d7fcc;*/
 }
 ul ul a {
     font-size: 0.9em !important;
@@ -238,7 +238,7 @@ a[data-toggle="collapse"] {
     position: absolute;
     top: 50%;
     right: 20px;
-    transform: translateY(-50%);
+   /* transform: translateY(-50%);*/
 }
 #navbar-example2{
     position: fixed;
@@ -379,7 +379,7 @@ a[data-toggle="collapse"] {
     <nav id="navbar-example2" class="navbar" >
         <a class="navbar-brand" href="#">MI19 Admin Panel</a>
         <div class="dropdown">
-            <a  style="padding-right:30px;font-size: 18px;" class=" dropdown-toggle" href="#"  id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a  style="padding-right:30px;font-size: 18px;color:#fff" class=" dropdown-toggle" href="#"  id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Admin
             </a>
           
@@ -409,9 +409,17 @@ a[data-toggle="collapse"] {
     </nav>
     
     <div class="wrapper" >
-        <nav id="sidebar" style="border:1px solid grey;box-Shadow:1px 1px 10px grey" >
+        <nav id="sidebar" style="border:1px solid grey;box-Shadow:1px 1px 10px grey;margin-top: 20px;" >
             <ul class="list-unstyled components" data-app-modern-menu="true">
-                <li class="nav-item dropdown">
+                <li class="nav-item">
+                    <a class="nav-link link text-primary display-7" href="/tracker/add/">
+                        ADD User</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link link text-primary display-7" href="/tracker/dashboard/">
+                        Dashboard</a>
+                </li>
+                <li class="nav-item ">
                     {% comment %}
                 <a class="nav-link link text-primary dropdown-toggle display-7" data-toggle="dropdown-submenu" aria-expanded="false">
                     Analytics</a>  
@@ -420,21 +428,24 @@ a[data-toggle="collapse"] {
                     <a class="text-primary dropdown-item display-7" href="/tracker/search/">Contact Tracing</a>
                 </div>
                 {% endcomment %}
-                <a class="text-primary  display-7" href="/tracker/search/">Path Tracing</a>
-                   
-            </li>
-            <li class="nav-item">
-                <a class="text-primary  display-7" href="/tracker/search/">Contact Tracing</a>
+                
+                <div class="dropdown ">
 
+                    <a  style="padding-right:30px;font-size: 18px;" class="text-primary dropdown-toggle nav-link link" href="#"  id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Analytics
+                    </a>
+                
+ <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <a class="dropdown-item text-primary  display-7" href="/tracker/search/">Path Tracing</a>
+                   
+           
+           
+                <a class="dropdown-item  text-primary  display-7" href="/tracker/search/">Contact Tracing</a>
+ </div>
             </li>
-            <li class="nav-item">
-                <a class="nav-link link text-primary display-7" href="/tracker/add/">
-                    ADD User</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link link text-primary display-7" href="/tracker/dashboard/">
-                    Dashboard</a>
-            </li>
+        </div>
+            
+            
             {% comment %}
            {% if request.user.is_authenticated %}
             <li class="nav-item">
